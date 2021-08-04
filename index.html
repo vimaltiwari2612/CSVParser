@@ -2,7 +2,10 @@
 <html>
 
 <script>
-
+	//global vars
+	var masterArray = [];
+	var dupCount = 0;
+	
 	function init() {
 	  document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
 	}
@@ -14,10 +17,16 @@
 	}
 
 	function handleFileLoad(event) {
-	  clear();
+	    clear();
 		var result = event.target.result;
+		parse(result);
+	}
+	
+	parse = (result) => {
+		clear();
 		if(result !== null && result !== undefined && result.trim() !== ''){
 			 createHeader();
+			 addTools();
 			 createTable();
 			 result.split('\n').forEach(e => createRow(e));
 			 updateHeader(result);
@@ -35,10 +44,11 @@
 			var header = document.getElementById("count");
 			rows = result.split('\n').length;
 			cols = result.split('\n')[0].split(',').length;
-			header.innerHTML = 'Rows : '+rows + ', Columns : '+cols;
+			header.innerHTML = 'Rows : '+rows + ', Columns : '+cols + ', Duplicates : '+dupCount;
 	}
 
 	createTable = () => {
+			masterArray = [];
 			var item = document.getElementById('fileContent');
 			var table = document.createElement("table");
 			table.id = 'resultTable';
@@ -53,8 +63,13 @@
 		var table = document.getElementById('resultTable');
 		var tr = document.createElement("tr");
 		e.split(',').forEach(e1 => tr.appendChild(createCol(e1)));
+		if(masterArray.includes(e)){
+			console.log('duplicate entry '+e);
+			tr.style.color='red';
+			dupCount++;
+		}
+		masterArray.push(e);
 		table.appendChild(tr);
-		console.log(e);
 	}
 
 	createCol = (e) => {
@@ -67,8 +82,42 @@
 	}
 
 	clear = () => {
+		masterArray = [];
+		dupCount = 0;
 		document.getElementById('fileContent').innerHTML = '';
 	}
+	
+	addTools = () => {
+		var item = document.getElementById('fileContent');
+		var toolBar = document.createElement('div');
+		toolBar.style.padding = '10px 10px 10px 10px';
+		item.appendChild(toolBar);
+		addRemoveDuplicateButton(toolBar);
+	}
+	
+	addRemoveDuplicateButton = (toolBar) => {
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Remove Duplicates';
+		button.setAttribute("onclick","removeDup();");
+		toolBar.appendChild(button);
+	}
+	
+	removeDup = () => {
+		
+		var temp = '';
+		var tempArray = [];
+		
+		masterArray.forEach( e => {
+			if(!tempArray.includes(e)){
+				tempArray.push(e);
+				temp += e +'\n';
+			}
+		});
+		
+		parse(temp);
+	}
+	
 </script>
 
 <body onload="init()">
