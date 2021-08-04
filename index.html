@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+
+	function init() {
+	  document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+	}
+
+	function handleFileSelect(event) {
+	  const reader = new FileReader()
+	  reader.onload = handleFileLoad;
+	  reader.readAsText(event.target.files[0])
+	}
+
+	function handleFileLoad(event) {
+	  clear();
+		var result = event.target.result;
+		if(result !== null && result !== undefined && result.trim() !== ''){
+			 createHeader();
+			 createTable();
+			 result.split('\n').forEach(e => createRow(e));
+			 updateHeader(result);
+		}
+	}
+
+	createHeader = () => {
+		var item = document.getElementById('fileContent');
+		var header = document.createElement("h4");
+		header.id = 'count';
+		item.appendChild(header);
+	}
+
+	updateHeader = (result) => {
+			var header = document.getElementById("count");
+			rows = result.split('\n').length;
+			cols = result.split('\n')[0].split(',').length;
+			header.innerHTML = 'Rows : '+rows + ', Columns : '+cols;
+	}
+
+	createTable = () => {
+			var item = document.getElementById('fileContent');
+			var table = document.createElement("table");
+			table.id = 'resultTable';
+			table.style.border= '1px solid black';
+			table.style.borderCollapse = 'collapse';
+			item.appendChild(table);
+	}
+
+	function createRow(e){
+		e = e.trim();
+		if(e === '') return null;
+		var table = document.getElementById('resultTable');
+		var tr = document.createElement("tr");
+		e.split(',').forEach(e1 => tr.appendChild(createCol(e1)));
+		table.appendChild(tr);
+		console.log(e);
+	}
+
+	createCol = (e) => {
+		var td = document.createElement("td");
+		td.style.border = '1px solid black';
+		var node = document.createTextNode(e);
+		td.appendChild(node);
+		return td;
+
+	}
+
+	clear = () => {
+		document.getElementById('fileContent').innerHTML = '';
+	}
+</script>
+
+<body onload="init()">
+  <input id="fileInput" type="file" name="file" />
+  <div id="fileContent"></div>
+</body>
+
+</html>
