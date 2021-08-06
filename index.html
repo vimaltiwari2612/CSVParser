@@ -5,6 +5,7 @@
 	//global vars
 	var masterArray = [];
 	var dupCount = 0;
+	var masterPojoArray = [];
 	
 	function init() {
 	  document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
@@ -30,7 +31,22 @@
 			 createTable();
 			 result.split('\n').forEach(e => createRow(e));
 			 updateHeader(result);
+			 updatePojo();
 		}
+	}
+
+	updatePojo = () =>{
+		var masterPojoArray = [];
+		for(var i = 0 ; i < masterArray.length ; i++){
+			var item = masterArray[i];
+			var items = item.split(',');
+			var pojo = {};
+			for(var j = 0; j < items.length ;j++){
+				pojo[j] = items[j];
+			}
+			masterPojoArray.push(pojo);
+		}
+
 	}
 
 	createHeader = () => {
@@ -49,6 +65,7 @@
 
 	createTable = () => {
 			masterArray = [];
+			masterPojoArray = [];
 			var item = document.getElementById('fileContent');
 			var table = document.createElement("table");
 			table.id = 'resultTable';
@@ -57,18 +74,33 @@
 			item.appendChild(table);
 	}
 
+	getTable = () => {
+		return document.getElementById('resultTable');
+	}
+
+	getNthRow = (n) => {
+		var table = getTable();
+		return table.childNodes[n-1];
+	}
+
 	function createRow(e){
 		e = e.trim();
 		if(e === '') return null;
 		var table = document.getElementById('resultTable');
 		var tr = document.createElement("tr");
-		e.split(',').forEach(e1 => tr.appendChild(createCol(e1)));
+		var items = e.split(',');
+		items.forEach(e1 => tr.appendChild(createCol(e1)));
 		if(masterArray.includes(e)){
 			console.log('duplicate entry '+e);
 			tr.style.color='red';
 			dupCount++;
 		}
 		masterArray.push(e);
+		var pojo = {};
+		for(var j = 0; j < items.length ;j++){
+			pojo[j] = items[j];
+		}
+		masterPojoArray.push(pojo);
 		table.appendChild(tr);
 	}
 
@@ -84,6 +116,7 @@
 	clear = () => {
 		masterArray = [];
 		dupCount = 0;
+		masterPojoArray = [];
 		document.getElementById('fileContent').innerHTML = '';
 	}
 	
@@ -93,21 +126,52 @@
 		toolBar.style.padding = '10px 10px 10px 10px';
 		item.appendChild(toolBar);
 		addRemoveDuplicateButton(toolBar);
+		addFirstRowAsHeaderButton(toolBar);
+	}
+
+	addFirstRowAsHeaderButton = (toolBar) => {
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Set First Row as Headers';
+		button.setAttribute("onclick","setFirstRowAsHeaders(this);");
+		toolBar.appendChild(button);
 	}
 	
 	addRemoveDuplicateButton = (toolBar) => {
 		var button = document.createElement('input');
 		button.type = 'button';
 		button.value = 'Remove Duplicates';
-		button.setAttribute("onclick","removeDup();");
+		button.setAttribute("onclick","removeDup(this);");
 		toolBar.appendChild(button);
 	}
 	
-	removeDup = () => {
-		
+	removeDup = (button) => {
+		if(dupCount < 1){
+			alert('0 Duplicates found.');
+			return;
+		}
+		button.setAttribute('disabled','true');
+		refreshUI(false);
+	}
+
+	refreshUI = (updateMasterArrayFromPojo) =>{
 		var temp = '';
 		var tempArray = [];
-		
+		if(updateMasterArrayFromPojo){
+			tempArray.push(masterArray[0]);//add first/header
+			masterPojoArray.forEach(item => {
+				temp = '';
+				for(i in item){
+					temp += ', '+item[i];
+				}
+				temp = temp.substring(1);
+				tempArray.push(temp);
+				
+			});
+			masterArray = tempArray;
+			tempArray = [];
+			temp = '';
+		}
 		masterArray.forEach( e => {
 			if(!tempArray.includes(e)){
 				tempArray.push(e);
@@ -117,6 +181,109 @@
 		
 		parse(temp);
 	}
+
+	setFirstRowAsHeaders = (button) => {
+		var firstRow = getNthRow(1);
+		firstRow.style.backgroundColor="Gray";
+		addFunctionsToHeader(firstRow);
+		masterPojoArray.shift();
+		button.setAttribute('disabled','true');
+	}
+
+	addFunctionsToHeader = (header) => {
+		var children = header.childNodes;
+		children.forEach(item => {
+			var button = document.createElement('button');
+			button.style.background = 'cyan';
+			button.setAttribute("onclick","popup(this);");
+			item.appendChild(button);
+			createPopup(item);
+		});
+	}
+
+	createPopup = (item) => {
+		var menu = document.createElement('div');
+		menu.className = 'popup'; 
+		var sort = document.createElement('div');
+		var sortLable = document.createTextNode('Sort');
+		var A_Z = document.createElement('input');
+		var br = document.createElement('br');
+		var Z_A = document.createElement('input');
+		Z_A.type = 'button';
+		A_Z.type = 'button';
+		Z_A.value = 'DESC';
+		A_Z.value = 'ASC';
+		Z_A.setAttribute('onclick','sort(this,"DESC");');
+		A_Z.setAttribute('onclick','sort(this,"ASC");');
+		sort.appendChild(sortLable);
+		sort.appendChild(br);
+		sort.appendChild(A_Z);
+		sort.appendChild(Z_A);
+		menu.appendChild(sort);
+		menu.style.zIndex='5';
+		menu.style.right = item.style.bottom;
+		menu.style.position = 'relative';
+		menu.style.background = 'yellow';
+		menu.style.left = '60px';
+		menu.style.border = '1px solid black';
+		menu.style.display = 'none';
+		menu.style.padding = '10px 10px 10px 10px';
+		item.appendChild(menu);
+	}
+
+	popup = (button) => {
+		closeAllPopups();
+		var menu = button.nextSibling;
+		menu.style.display = 'block';
+	}
+
+	closeAllPopups = () => {
+		var popUps = document.getElementsByClassName('popup');
+		for(var i = 0 ; i < popUps.length ; i++){
+			popUps[i].style.display = 'none';
+		}
+	}
+
+	sort = (button,order) =>{
+		var content = button.parentElement.parentElement.parentElement.childNodes[0].textContent;
+		console.log('Sort col with header : '+content +' in '+ order +' order');
+		var firstRow = masterArray[0].split(',');
+		var count = 0;
+		for(var i = 0 ; i < firstRow.length ; i++){
+			if(firstRow[i] === content){
+				break;
+			}
+			count++;
+		};
+		console.log('Sort col number '+ count+ ' with header : '+content +' in '+ order +' order');
+		sortMasterArray(count, order);
+		refreshUI(true);
+	}
+
+	sortMasterArray = (colIndex,order) =>{
+		
+		masterPojoArray.sort((a,b) => {
+			
+			if(order == 'ASC'){
+				if(a[colIndex] > b[colIndex]){
+					return 1;
+				}else if(a[colIndex] < b[colIndex]){
+					return -1;
+				}else{
+					return 0;
+				}
+			}else{
+				if(a[colIndex] > b[colIndex]){
+					return -1;
+				}else if(a[colIndex] < b[colIndex]){
+					return 1;
+				}else{
+					return 0;
+				}
+			}
+		});
+	}
+
 	
 </script>
 
