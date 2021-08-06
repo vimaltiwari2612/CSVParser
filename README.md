@@ -4,10 +4,10 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 
 # How It works
 
-- generate table
-- detects Duplicates
+- Generate table
+- Detects Duplicates
 - Remove Duplicates
-- Sorting
+- Sorting based on Columns
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/128226094-dead2e01-f305-4297-83b5-a458a56e2301.gif)
 
