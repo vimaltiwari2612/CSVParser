@@ -83,6 +83,15 @@
 		return table.childNodes[n-1];
 	}
 
+	getNthColumn = (n) =>{
+		var column = [];
+		var table = getTable();
+		table.childNodes.forEach(row => {
+			column.push(row.childNodes[n]);
+		});
+		return column;
+	}
+
 	function createRow(e){
 		e = e.trim();
 		if(e === '') return null;
@@ -184,7 +193,7 @@
 
 	setFirstRowAsHeaders = (button) => {
 		var firstRow = getNthRow(1);
-		firstRow.style.backgroundColor="Gray";
+		firstRow.style.backgroundColor="lightgray";
 		addFunctionsToHeader(firstRow);
 		masterPojoArray.shift();
 		button.setAttribute('disabled','true');
@@ -192,18 +201,121 @@
 
 	addFunctionsToHeader = (header) => {
 		var children = header.childNodes;
-		children.forEach(item => {
+		children.forEach((item,index ) => {
 			var button = document.createElement('button');
 			button.style.background = 'cyan';
 			button.setAttribute("onclick","popup(this);");
 			item.appendChild(button);
-			createPopup(item);
+			createPopup(index,item);
 		});
 	}
 
-	createPopup = (item) => {
+	createPopup = (index,item) => {
+		var menu = createMainMenu();
+		menu.style.right = item.style.bottom;
+		menu.appendChild(createSortMenuItem());
+		menu.appendChild(addSeperator(true));
+		menu.appendChild(createFilterMenuItem(index,item));
+		item.appendChild(menu);
+	}
+
+	createFilterMenuItem = (index,item) => {
+		var filterDiv = document.createElement('div');
+		var filterButton = document.createElement('input');
+		filterButton.type = 'button';
+		filterButton.value = 'Filter';
+		filterButton.name = index;
+		filterButton.setAttribute('onclick','showColumnSelection(this)');
+		filterDiv.appendChild(filterButton);
+		filterDiv.appendChild(addSeperator(false));
+		filterDiv.appendChild(addSeperator(false));
+		var columnListDiv = document.createElement('div');
+		columnListDiv.style.border = '1px solid black';
+		columnListDiv.style.padding = '5px';
+		columnListDiv.style.background = 'white';
+		columnListDiv.style.overflow = 'scroll';
+		columnListDiv.style.height = '60px';
+		columnListDiv.style.display = 'none';
+		filterDiv.appendChild(columnListDiv);
+		filterDiv.appendChild(addSeperator(false));
+		var applyFilter = document.createElement('input');
+		applyFilter.type = 'button';
+		applyFilter.value = 'Apply';
+		applyFilter.style.display = 'none';
+		applyFilter.setAttribute('onclick', 'applyFilter(this)');
+		filterDiv.appendChild(applyFilter);
+		return filterDiv;
+	}
+
+	showColumnSelection = (button) => {
+		var columns = getNthColumn(parseInt(button.name));
+		columns.shift(); // remove first, it's header value
+		var columnsText = [];
+		columns.forEach(td => {
+			columnsText.push(td.childNodes[0].textContent);
+		});
+		columnsText = columnsText.filter((value,index,self) => {
+			return self.indexOf(value) === index;
+		});
+		//set it in div
+		var selectionDiv = button.nextSibling.nextSibling.nextSibling;//after 2 <br>
+		columnsText.forEach(item => {
+			var checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.name = item;
+			checkbox.checked = true;
+			var label = document.createElement('label');
+			label.innerHTML = item;
+			selectionDiv.appendChild(checkbox);
+			selectionDiv.appendChild(label);
+			selectionDiv.appendChild(addSeperator(false));
+		});
+		selectionDiv.style.display = 'block';
+		button.disabled = true;
+		var applyFilterButton = selectionDiv.nextSibling.nextSibling;
+		applyFilterButton.style.display = 'block';
+		applyFilterButton.name = button.name;
+	}
+
+	applyFilter = (button) => {
+		var selectedColumns = [];
+		var allCheckboxes = button.parentElement.childNodes[3].childNodes;
+		allCheckboxes.forEach(item => {
+			if(item.type == 'checkbox' && item.checked){
+				selectedColumns.push(item.name);
+			}
+		});
+		
+		//update the UI
+		var colIndex = parseInt(button.name);//columns index
+		var tempPojo = [];
+		masterPojoArray.forEach(row => {
+			if(selectedColumns.indexOf(row[colIndex]) != -1){
+				tempPojo.push(row);
+			}
+		});
+		masterPojoArray = tempPojo;
+		refreshUI(true);
+	}
+
+	addSeperator = (addHRLine) =>{
+		return (addHRLine)?document.createElement('hr'):document.createElement('br');
+	}
+
+	createMainMenu = () => {
 		var menu = document.createElement('div');
 		menu.className = 'popup'; 
+		menu.style.zIndex='5';
+		menu.style.position = 'relative';
+		menu.style.background = 'yellow';
+		menu.style.left = '60px';
+		menu.style.border = '1px solid black';
+		menu.style.display = 'none';
+		menu.style.padding = '10px 10px 10px 10px';
+		return menu;
+	}
+
+	createSortMenuItem = () => {
 		var sort = document.createElement('div');
 		var sortLable = document.createTextNode('Sort');
 		var A_Z = document.createElement('input');
@@ -219,16 +331,7 @@
 		sort.appendChild(br);
 		sort.appendChild(A_Z);
 		sort.appendChild(Z_A);
-		menu.appendChild(sort);
-		menu.style.zIndex='5';
-		menu.style.right = item.style.bottom;
-		menu.style.position = 'relative';
-		menu.style.background = 'yellow';
-		menu.style.left = '60px';
-		menu.style.border = '1px solid black';
-		menu.style.display = 'none';
-		menu.style.padding = '10px 10px 10px 10px';
-		item.appendChild(menu);
+		return sort;
 	}
 
 	popup = (button) => {
@@ -255,7 +358,6 @@
 			}
 			count++;
 		};
-		console.log('Sort col number '+ count+ ' with header : '+content +' in '+ order +' order');
 		sortMasterArray(count, order);
 		refreshUI(true);
 	}
