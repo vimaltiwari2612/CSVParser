@@ -8,6 +8,7 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 - Detects Duplicates
 - Remove Duplicates
 - Sorting based on Columns
+- coloum based filtering
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/128226094-dead2e01-f305-4297-83b5-a458a56e2301.gif)
 
