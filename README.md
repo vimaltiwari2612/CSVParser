@@ -19,7 +19,8 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 - ***Column based filtering***
 
 
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/128686541-6876e053-951c-46d9-bbe6-c5e163bfbf1d.gif)
+![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/22127564/128687173-c31c1629-bcc2-4df6-8b07-b609fd5c7bd0.gif)
+
 
 
 # Tech Stack
