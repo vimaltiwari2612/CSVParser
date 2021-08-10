@@ -4,25 +4,16 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 
 # Features / Demo
 
-- Generate table
+- ***Generate table***
 - ***Detects Duplicates***
 - ***Remove Duplicates***
-
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/128226094-dead2e01-f305-4297-83b5-a458a56e2301.gif)
-
 - ***Sorting based on Columns***
-
-
-![ezgif com-gif1-maker](https://user-images.githubusercontent.com/22127564/128504753-3c370da3-192a-49fc-ba66-7f0ade688541.gif)
-
-
 - ***Column based filtering***
-
-
-![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/22127564/128687173-c31c1629-bcc2-4df6-8b07-b609fd5c7bd0.gif)
-
 - ***Add and Delete Rows***
 - ***Download (.Csv)***
+
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/128863990-a28b4575-126d-4fed-a138-a78ae74d180e.gif)
+
 
 # Tech Stack
  - HTML
