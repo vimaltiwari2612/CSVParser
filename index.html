@@ -14,7 +14,7 @@
 	function handleFileSelect(event) {
 	  const reader = new FileReader()
 	  reader.onload = handleFileLoad;
-	  reader.readAsText(event.target.files[0])
+	  reader.readAsText(event.target.files[0]);
 	}
 
 	function handleFileLoad(event) {
@@ -132,11 +132,112 @@
 	addTools = () => {
 		var item = document.getElementById('fileContent');
 		var toolBar = document.createElement('div');
+		toolBar.id = 'toolBar';
 		toolBar.style.padding = '10px 10px 10px 10px';
 		item.appendChild(toolBar);
+		populateToolBar(toolBar);
+	}
+
+	populateToolBar = (toolBar) => {
+		addAddRowButton(toolBar);
+		addDeleteRowButton(toolBar);
+		addSaveButton(toolBar);
+		addCancelButton(toolBar);
 		addRemoveDuplicateButton(toolBar);
 		addFirstRowAsHeaderButton(toolBar);
 		addDownloadButton(toolBar);
+	}
+
+	addSaveButton = (toolBar) =>{
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Save';
+		button.setAttribute("onclick","save(this);");
+		button.style.display = 'none';
+		toolBar.appendChild(button);
+	}
+
+	addCancelButton = (toolBar) =>{
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Cancel';
+		button.setAttribute("onclick","cancel(this);");
+		button.style.display = 'none';
+		toolBar.appendChild(button);
+	}
+
+	save = (button) =>{
+		var table = getTable();
+		var rows = table.childNodes;
+		for(var i = 1 ; i < rows.length ; i++){
+			var row = rows[i];
+			var firstCol = row.childNodes[0];
+			if(!firstCol.checked){
+				var item = masterArray.splice(i,1,null);
+			}
+		}
+		masterArray = masterArray.filter(item => {
+			return item != null;
+		});
+		refreshUI(false);
+	}
+
+	cancel = (button) => {
+		refreshUI(false);
+	}
+
+	addDeleteRowButton = (toolBar) =>{
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Delete Row';
+		button.setAttribute("onclick","deleteRow(this);");
+		toolBar.appendChild(button);
+	}
+
+	deleteRow = (button) => {
+		var table = getTable();
+		var rows = table.childNodes;
+		for(var i = 0 ; i < rows.length ; i++){
+			var row = rows[i];
+			var item = null;
+			if(i > 0){
+				item = document.createElement('input');
+				item.type = 'checkbox';
+				item.checked = true;
+				
+			}else{//no checkbox for header
+				item = document.createTextNode('Rows Selected');
+			}
+			var firstTd = row.childNodes[0];
+			row.insertBefore(item,firstTd);
+		}
+		button.style.display = 'none';
+		displayAllButtons('none');
+		button.nextSibling.style.display = 'block';
+		button.nextSibling.nextSibling.style.display = 'block';
+	}
+
+	displayAllButtons = (type) => {
+		var toolBar = document.getElementById('toolBar');
+		toolBar.childNodes.forEach(item => {
+			item.style.display = type;
+		});
+	}
+
+	addAddRowButton = (toolBar) =>{
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Add Row';
+		button.setAttribute("onclick","addRow(this);");
+		toolBar.appendChild(button);
+	}
+
+	addRow = (button) => {
+		var data = prompt('Enter "," seperated Data ');
+		if(data == null){
+			return;
+		}
+		createRow(data);
 	}
 
 	addDownloadButton = (toolBar) =>{
@@ -148,6 +249,11 @@
 	}
 
 	exportToCSV = (button) => {
+		filename = prompt('Save As (.csv)');
+		if(filename == null){
+			return;
+		}
+		filename += '.csv';
 		var table = getTable();
 		var csv = [];
 		var rows = table.childNodes;
@@ -163,7 +269,6 @@
 		csv = csv.join("\n");
 		var csvFile;
 		var downloadLink;
-		filename = 'table.csv';
 		// CSV FILE
 		csvFile = new Blob([csv], {type: "text/csv"});
 
