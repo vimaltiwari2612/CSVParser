@@ -21,8 +21,8 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 
 ![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/22127564/128687173-c31c1629-bcc2-4df6-8b07-b609fd5c7bd0.gif)
 
-- *** Add and Delete Rows ***
-- *** Download (.Csv) ***
+- ***Add and Delete Rows***
+- ***Download (.Csv)***
 
 # Tech Stack
  - HTML
