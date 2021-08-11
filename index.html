@@ -6,6 +6,8 @@
 	var masterArray = [];
 	var dupCount = 0;
 	var masterPojoArray = [];
+	var isEdit = false;
+	var isDelete = false;
 	
 	function init() {
 	  document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
@@ -126,6 +128,8 @@
 		masterArray = [];
 		dupCount = 0;
 		masterPojoArray = [];
+		isEdit = false;
+		isDelete - false;
 		document.getElementById('fileContent').innerHTML = '';
 	}
 	
@@ -140,6 +144,7 @@
 
 	populateToolBar = (toolBar) => {
 		addAddRowButton(toolBar);
+		addEditRowButton(toolBar);
 		addDeleteRowButton(toolBar);
 		addSaveButton(toolBar);
 		addCancelButton(toolBar);
@@ -148,9 +153,25 @@
 		addDownloadButton(toolBar);
 	}
 
+	addEditRowButton = (toolBar) => {
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.value = 'Edit';
+		button.setAttribute("onclick","editRows(this);");
+		toolBar.appendChild(button);
+	}
+
+	editRows = (button) => {
+		isEdit = true;
+		addRowSelectionUI(button);
+		displayAllButtons('none');
+		displaySaveAndCancel('block');
+	}
+
 	addSaveButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'save';
 		button.value = 'Save';
 		button.setAttribute("onclick","save(this);");
 		button.style.display = 'none';
@@ -160,6 +181,7 @@
 	addCancelButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'cancel';
 		button.value = 'Cancel';
 		button.setAttribute("onclick","cancel(this);");
 		button.style.display = 'none';
@@ -167,18 +189,41 @@
 	}
 
 	save = (button) =>{
+
 		var table = getTable();
 		var rows = table.childNodes;
 		for(var i = 1 ; i < rows.length ; i++){
 			var row = rows[i];
 			var firstCol = row.childNodes[0];
-			if(!firstCol.checked){
-				var item = masterArray.splice(i,1,null);
+			//in case of delete
+			if(isDelete){
+				if(!firstCol.checked){
+					var item = masterArray.splice(i,1,null);
+				}
+			}
+			if(isEdit){
+				var updatedRow = '';
+				//iterate whole row to get content
+				while(firstCol.nextSibling != null){
+					firstCol = firstCol.nextSibling;
+					var children = firstCol.childNodes[0];
+					debugger;
+					if(children.type != 'text'){
+						//it's a text
+						updatedRow += ','+children.textContent;
+					}else{
+						updatedRow += ','+children.value;	
+					}
+				}
+				var item = masterArray.splice(i,1,updatedRow.substring(1));
 			}
 		}
+
+		//fitler out null values
 		masterArray = masterArray.filter(item => {
 			return item != null;
 		});
+
 		refreshUI(false);
 	}
 
@@ -189,12 +234,26 @@
 	addDeleteRowButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
-		button.value = 'Delete Row';
+		button.value = 'Delete';
 		button.setAttribute("onclick","deleteRow(this);");
 		toolBar.appendChild(button);
 	}
 
 	deleteRow = (button) => {
+		addRowSelectionUI(button);
+		displayAllButtons('none');
+		displaySaveAndCancel('block');
+		isDelete = true;
+	}
+
+	displaySaveAndCancel = (value) =>{
+		var saveButton = document.getElementById('save');
+		saveButton.style.display = value;
+		var cancelButton = document.getElementById('cancel');
+		cancelButton.style.display = value;
+	}
+
+	addRowSelectionUI = (button) => {
 		var table = getTable();
 		var rows = table.childNodes;
 		for(var i = 0 ; i < rows.length ; i++){
@@ -202,8 +261,12 @@
 			var item = null;
 			if(i > 0){
 				item = document.createElement('input');
+				item.id = 'checkbox '+i;
 				item.type = 'checkbox';
-				item.checked = true;
+				item.checked = (button.value == 'Delete')?true:false;
+				if(isEdit){
+					item.setAttribute('onclick','makeRowEditable(this);');
+				}
 				
 			}else{//no checkbox for header
 				item = document.createTextNode('Rows Selected');
@@ -211,10 +274,23 @@
 			var firstTd = row.childNodes[0];
 			row.insertBefore(item,firstTd);
 		}
-		button.style.display = 'none';
-		displayAllButtons('none');
-		button.nextSibling.style.display = 'block';
-		button.nextSibling.nextSibling.style.display = 'block';
+	}
+
+	makeRowEditable = (checkbox) => {
+		var isEditable = checkbox.checked;
+		while(checkbox != null){
+			checkbox = checkbox.nextSibling;
+			var item = null;
+			if(isEditable){
+				item = document.createElement('input');
+				item.type = 'text';
+				item.value = checkbox.textContent;
+			}else{
+				item = document.createTextNode(checkbox.childNodes[0].value);
+			}
+			checkbox.innerHTML='';
+			checkbox.appendChild(item);
+		}
 	}
 
 	displayAllButtons = (type) => {
@@ -227,7 +303,7 @@
 	addAddRowButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
-		button.value = 'Add Row';
+		button.value = 'Add';
 		button.setAttribute("onclick","addRow(this);");
 		toolBar.appendChild(button);
 	}
