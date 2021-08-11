@@ -299,10 +299,10 @@
 	}
 
 	deleteRow = (button) => {
+		isDelete = true;
 		addRowSelectionUI(button);
 		displayAllButtons('none');
 		displaySaveAndCancel('block');
-		isDelete = true;
 	}
 
 	displaySaveAndCancel = (value) =>{
@@ -322,11 +322,10 @@
 				item = document.createElement('input');
 				item.id = 'checkbox '+i;
 				item.type = 'checkbox';
-				item.checked = (button.value == 'Delete')?true:false;
+				item.checked = (isDelete)?true:false;
 				if(isEdit){
 					item.setAttribute('onclick','makeRowEditable(this);');
 				}
-				
 			}else{//no checkbox for header
 				item = document.createTextNode('Rows Selected');
 			}
@@ -363,17 +362,28 @@
 		var button = document.createElement('input');
 		button.type = 'button';
 		button.id = 'add';
-		button.value = 'Add';
-		button.setAttribute("onclick","addRow(this);");
+		button.value = 'Add Row';
+		button.setAttribute("onclick","createEditableRow(this);");
 		toolBar.appendChild(button);
 	}
 
-	addRow = (button) => {
-		var data = prompt('Enter "," seperated Data ');
-		if(data == null){
-			return;
+	createEditableRow = (button) => {
+		var colsCount = getNthRow(1).childNodes.length;
+		var table = getTable();
+		var tr = document.createElement('tr');
+		while(colsCount > 0){
+			var td = document.createElement('td');
+			var inputBox = document.createElement('input');
+			inputBox.type = 'text';
+			td.appendChild(inputBox);
+			tr.appendChild(td);
+			colsCount--;
 		}
-		createRow(data);
+		table.appendChild(tr);
+		isEdit = true;
+		addRowSelectionUI(button);
+		displayAllButtons('none');
+		displaySaveAndCancel('block');
 	}
 
 	addDownloadButton = (toolBar) =>{
