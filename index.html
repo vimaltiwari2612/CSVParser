@@ -82,6 +82,9 @@
 				if(item.id == 'removeDuplicate'){
 					color = 'lightsteelblue';
 				}
+				if(item.id == 'addCol'){
+					color = 'aquamarine';
+				}
 				
 				item.style.margin = '5px';
 				item.style.background = color;
@@ -201,6 +204,7 @@
 
 	populateToolBar = (toolBar) => {
 		addAddRowButton(toolBar);
+		addAddColButton(toolBar);
 		addEditRowButton(toolBar);
 		addDeleteRowButton(toolBar);
 		addSaveButton(toolBar);
@@ -208,6 +212,15 @@
 		addRemoveDuplicateButton(toolBar);
 		addFirstRowAsHeaderButton(toolBar);
 		addDownloadButton(toolBar);
+	}
+
+	addAddColButton = (toolbar) => {
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.id = 'addCol';
+		button.value = 'Add Column';
+		button.setAttribute("onclick","createInTable(this,'col');");
+		toolBar.appendChild(button);
 	}
 
 	addEditRowButton = (toolBar) => {
@@ -250,11 +263,11 @@
 
 		var table = getTable();
 		var rows = table.childNodes;
-		for(var i = 1 ; i < rows.length ; i++){
+		for(var i = 0 ; i < rows.length ; i++){
 			var row = rows[i];
 			var firstCol = row.childNodes[0];
 			//in case of delete
-			if(isDelete){
+			if(isDelete && i > 0){
 				if(!firstCol.checked){
 					var item = masterArray.splice(i,1,null);
 				}
@@ -363,23 +376,37 @@
 		button.type = 'button';
 		button.id = 'add';
 		button.value = 'Add Row';
-		button.setAttribute("onclick","createEditableRow(this);");
+		button.setAttribute("onclick","createInTable(this,'row');");
 		toolBar.appendChild(button);
 	}
 
-	createEditableRow = (button) => {
-		var colsCount = getNthRow(1).childNodes.length;
+	createInTable = (button,item) => {
 		var table = getTable();
-		var tr = document.createElement('tr');
-		while(colsCount > 0){
-			var td = document.createElement('td');
-			var inputBox = document.createElement('input');
-			inputBox.type = 'text';
-			td.appendChild(inputBox);
-			tr.appendChild(td);
-			colsCount--;
+		if(item == 'row'){
+			var colsCount = getNthRow(1).childNodes.length;
+			var tr = document.createElement('tr');
+			while(colsCount > 0){
+				var td = document.createElement('td');
+				var inputBox = document.createElement('input');
+				inputBox.type = 'text';
+				td.appendChild(inputBox);
+				tr.appendChild(td);
+				colsCount--;
+			}
+			table.appendChild(tr);
 		}
-		table.appendChild(tr);
+		else if (item == 'col'){
+			var rowCount = table.childNodes.length;
+			while(rowCount > 0){
+				var row = getNthRow(rowCount);
+				var td = document.createElement('td');
+				var inputBox = document.createElement('input');
+				inputBox.type = 'text';
+				td.appendChild(inputBox);
+				row.appendChild(td);
+				rowCount--;
+			}
+		}
 		isEdit = true;
 		addRowSelectionUI(button);
 		displayAllButtons('none');
