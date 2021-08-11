@@ -10,6 +10,7 @@ A simple online tool to view csv files in tabular format. Can be used for data a
 - ***Sorting based on Columns***
 - ***Column based filtering***
 - ***Add and Delete Rows***
+- ***Add and Delete columns***
 - ***Edit Rows data***
 - ***Download (.Csv)***
 
