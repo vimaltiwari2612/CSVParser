@@ -34,7 +34,64 @@
 			 result.split('\n').forEach(e => createRow(e));
 			 updateHeader(result);
 			 updatePojo();
+			 updateUI();
 		}
+	}
+
+	updateUI = () => {
+		//parent DIv
+		var mainFrame = document.getElementById('fileContent');
+		mainFrame.style.background = 'antiquewhite';
+		mainFrame.style.border = '2px Solid black';
+		mainFrame.style.padding = '10px 10px 10px 10px';
+		mainFrame.style.marginTop = '10px';
+		mainFrame.style.overflow = 'auto';
+		mainFrame.style.textAlign = 'center';
+		//h4
+
+		//toolbar div
+		var toolbar = document.getElementById('toolBar');
+		toolbar.style.borderBlock = 'inherit';
+		toolbar.style.borderBlockColor= 'red';
+		toolbar.style.marginBottom = '10px';
+		toolbar.style.textAlign = 'center';
+		toolbar.childNodes.forEach(item => {
+			if(item.type == 'button'){
+				var color = null;
+				if(item.id == 'add'){
+					color = 'lightblue';
+				}
+				if(item.id == 'edit'){
+					color = 'lightgreen';
+				}
+				if(item.id == 'delete'){
+					color = 'lightcoral';
+				}
+				if(item.id == 'save'){
+					color = 'lightpink';
+				}
+				if(item.id == 'cancel'){
+					color = 'lightsalmon';
+				}
+				if(item.id == 'download'){
+					color = 'lightyellow';
+				}
+				if(item.id == 'filter'){
+					color = 'lightseagreen';
+				}
+				if(item.id == 'removeDuplicate'){
+					color = 'lightsteelblue';
+				}
+				
+				item.style.margin = '5px';
+				item.style.background = color;
+			}
+			
+		});
+		//table
+		var table = document.getElementById('resultTable');
+		table.style.width = '100%';
+
 	}
 
 	updatePojo = () =>{
@@ -156,6 +213,7 @@
 	addEditRowButton = (toolBar) => {
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'edit';
 		button.value = 'Edit';
 		button.setAttribute("onclick","editRows(this);");
 		toolBar.appendChild(button);
@@ -234,6 +292,7 @@
 	addDeleteRowButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'delete';
 		button.value = 'Delete';
 		button.setAttribute("onclick","deleteRow(this);");
 		toolBar.appendChild(button);
@@ -303,6 +362,7 @@
 	addAddRowButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'add';
 		button.value = 'Add';
 		button.setAttribute("onclick","addRow(this);");
 		toolBar.appendChild(button);
@@ -319,6 +379,7 @@
 	addDownloadButton = (toolBar) =>{
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id = 'download';
 		button.value = 'Download';
 		button.setAttribute("onclick","exportToCSV(this);");
 		toolBar.appendChild(button);
@@ -370,6 +431,7 @@
 	addFirstRowAsHeaderButton = (toolBar) => {
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id='filter';
 		button.value = 'Set First Row as Headers';
 		button.setAttribute("onclick","setFirstRowAsHeaders(this);");
 		toolBar.appendChild(button);
@@ -378,6 +440,7 @@
 	addRemoveDuplicateButton = (toolBar) => {
 		var button = document.createElement('input');
 		button.type = 'button';
+		button.id='removeDuplicate';
 		button.value = 'Remove Duplicates';
 		button.setAttribute("onclick","removeDup(this);");
 		toolBar.appendChild(button);
