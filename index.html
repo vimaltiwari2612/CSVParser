@@ -179,9 +179,27 @@
 		var td = document.createElement("td");
 		td.style.border = '1px solid black';
 		var node = document.createTextNode(e);
+		td.setAttribute('onclick','editCol(this)');
 		td.appendChild(node);
 		return td;
 
+	}
+
+	editCol = (td) =>{
+		debugger;
+		var itemType = td.childNodes[0].type;
+		if(itemType != undefined) return;
+		if(!isEdit){
+			isEdit = true;
+			addRowSelectionUI(null);
+		}
+		var item = document.createElement('input');
+		item.type = 'text';
+		item.value = td.innerHTML;
+		td.innerHTML = '';
+		td.appendChild(item);
+		displayAllButtons('none');
+		displaySaveAndCancel('block');
 	}
 
 	clear = () => {
