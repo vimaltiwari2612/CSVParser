@@ -1,6 +1,6 @@
 # CSVParser
 
-A simple online tool to view csv files in tabular format. Can be used for data analysis, Or ***when MS-Excel doesn't open :stuck_out_tongue_winking_eye:***
+A simple online tool to view csv files in tabular format and do certain operations like edit, delete, add, update data, sort and filter them. Can be used for data analysis, Or ***when MS-Excel doesn't open :stuck_out_tongue_winking_eye:***
 
 # Features / Demo
 
