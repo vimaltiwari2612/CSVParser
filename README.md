@@ -29,5 +29,5 @@ A simple online tool to view csv files in tabular format and do certain operatio
 
 # Future scope
 - Support for other file formats
-- Adding toolbar like MS-Excel for editing
+- Adding Functions like Vlookup
 - Aggregate functions
