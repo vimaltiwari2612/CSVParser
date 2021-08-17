@@ -18,14 +18,18 @@ A simple online tool to view csv files in tabular format and do certain operatio
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/129059350-15f642c9-cf7f-4b15-a1b9-09ccdcdc8584.gif)
 
-
 ![image](https://user-images.githubusercontent.com/22127564/129702908-184af6e3-6c4f-4b93-9317-45e65025150b.png)
+
+# Charts Demo
+
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/22127564/129703859-6ccd04f3-1332-4ad4-ac28-5b1d413a1cc4.gif)
 
 
 # Tech Stack
  - HTML
  - Pure Javascript
  - CSS
+ - [For charts](https://www.chartjs.org/)
 
 # Future scope
 - Support for other file formats
