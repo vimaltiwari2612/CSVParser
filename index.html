@@ -1,6 +1,43 @@
 <!DOCTYPE html>
 <html>
+<script src="Chart.min.js"></script>
+<style>
+	#bg_mask {
+		position: absolute;
+		top: 0;
+		right: 0;  bottom: 0;
+		left: 0;
+		margin: auto;
+		margin-top: 0px;
+		width: 981px;
+		height: auto;
+		z-index: 0;
+		visibility: hidden;
+	  } 
+	  
+	  #frontlayer {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		margin: 70px 140px 175px 140px;
+		padding : 30px;
+		width: 700px;
+		height: 500px;
+		background-color : azure;
+		visibility: hidden;
+		border: 2px solid black;
+		z-index: 1;
+	  }
 
+	 #header_frontLayer {
+		border-block: inherit;
+		border-block-color: red;
+		padding-block: inherit;
+		margin-bottom: 10px;
+	  }
+</style>
 <script>
 	//global vars
 	var masterArray = [];
@@ -85,6 +122,10 @@
 				if(item.id == 'addCol'){
 					color = 'aquamarine';
 				}
+				if(item.id == 'enableChart'){
+					color = 'darkkhaki';
+				}
+				
 				
 				item.style.margin = '5px';
 				item.style.background = color;
@@ -230,6 +271,28 @@
 		addRemoveDuplicateButton(toolBar);
 		addFirstRowAsHeaderButton(toolBar);
 		addDownloadButton(toolBar);
+		addCreateChartButton(toolBar);
+	}
+
+	addCreateChartButton = (toolBar) =>{
+		var button = document.createElement('input');
+		button.type = 'button';
+		button.id = 'enableChart';
+		button.value = 'Create Chart';
+		button.setAttribute("onclick","enableChart(this);");
+		toolBar.appendChild(button);
+	}
+	
+	enableChart = (button) =>{
+		
+		document.getElementById('bg_mask').style.visibility='visible';
+  		document.getElementById('frontlayer').style.visibility='visible';
+	}
+
+
+	hideChart = (button) =>{
+		document.getElementById('bg_mask').style.visibility='hidden';
+  		document.getElementById('frontlayer').style.visibility='hidden';
 	}
 
 	addAddColButton = (toolbar) => {
@@ -732,13 +795,110 @@
 			}
 		});
 	}
-
 	
+	//for chart creation
+	createChart = (xData,yData) => {
+		if(xData === '' || yData === ''){
+			console.log('Either X-axis OR Y-axis is blank');
+			return;
+		}
+		var canvas = document.getElementById('myChart');
+		var ctx = canvas.getContext('2d');
+		canvas.style.border = '1px solid Black';
+		var label = xData.split(',');
+		var dataSet = yData.split(',');
+		var chartType = document.getElementById('chartType').value;
+		console.log('Labels : '+label );
+		console.log('Data : '+dataSet);
+		console.log('chartType : '+chartType);
+		var myChart = new Chart(ctx, {
+			type: chartType,
+			data: {
+				labels: label,
+				datasets: [{
+					label: chartType,
+					data:dataSet,
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(54, 162, 235, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(75, 192, 192, 0.2)',
+						'rgba(153, 102, 255, 0.2)',
+						'rgba(255, 159, 64, 0.2)'
+					],
+					borderColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(75, 192, 192, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(255, 159, 64, 1)'
+					],
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+		});
+	}
+
+	generateChart = () =>{
+		var xAxis = document.getElementById('xAxis').value;
+		var yAxis = document.getElementById('yAxis').value;
+		if(xAxis === '' || yAxis === ''){
+			alert('Provide both Column numbers.');
+			return;
+		}
+		createChart(getDelimInput(xAxis,','),getDelimInput(yAxis,','));
+	}
+
+	getDelimInput = (colNumber, delim) =>{
+		var colNum = parseInt(colNumber);
+		var finalVal = [];
+		for(var i = 1 ; i < masterPojoArray.length ;i++){
+			var pojo = masterPojoArray[i];
+			var item = pojo[colNum-1];
+			if(finalVal.indexOf(item) == -1){
+				finalVal.push(item);
+			}
+		}
+		return finalVal.join(delim);
+	}
+
 </script>
 
 <body onload="init()">
   <input id="fileInput" type="file" name="file" />
   <div id="fileContent"></div>
+  <div id="bg_mask">
+	<div id="frontlayer">
+		<div id="header_frontLayer">
+			<label>Chart Type</label>
+			<select id="chartType">
+				<option value="bar">Bar</option>
+				<option value="pie">Pie</option>
+				<option value="line">Line</option>
+				<option value="polarArea">PolarArea</option>
+				<option value="radar">Radar</option>
+				<option value="bubble">Bubble</option>
+				<option value="doughnut">Doughnut</option>
+				<option value="scatter">Scatter</option>
+			</select>
+			<input type='text' id='xAxis' placeholder="First Column Number..."/>
+			<input type='text' id='yAxis' placeholder="Second Column Number..."/>
+			<input type="button" value="Generate" onclick="generateChart(this);"/>
+			<input type="button" value="Close[X]" onclick="hideChart(this);"/>
+		</div>
+		<canvas id="myChart"></canvas>
+	</div>
+  </div>
 </body>
 
 </html>
